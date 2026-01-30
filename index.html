@@ -3,379 +3,345 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Bug Identifier by Picture | Instant Insect & Spider ID Online</title>
-    <meta name="description" content="Identify insects, spiders, and bugs instantly with our free online tool. Upload a photo or use your cam for accurate identification. No app download needed.">
-    <meta name="keywords" content="bug identifier, insect identifier, spider identifier, insect identifier by picture, free bug identifier app, insect identifier by photo cam, google insect identifier, flying insect identifier">
-    <meta name="author" content="Your Brand Name">
+    <title>Free AI Bug Identifier | Insect Identifier by Picture Camera</title>
+    <meta name="description" content="Identify bugs and insects instantly for free using AI. No sign-up required. Upload a photo or use your camera for real-time insect identification.">
+    <meta name="keywords" content="bug identifier, insect identifier, spider identifier, insect identifier by picture online free, free bug identifier app, google insect identifier, flying insect identifier">
+    <meta name="author" content="Free AI Insect Identifier">
     <link rel="canonical" href="https://bugidentifieronlinefree.github.io/" />
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- TensorFlow.js & MobileNet (The Free AI Brain) -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@latest"></script>
 
     <!-- Schema Markup -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "Free Insect Identifier",
+      "@type": "WebApplication",
+      "name": "Free AI Insect Identifier",
       "url": "https://bugidentifieronlinefree.github.io/",
-      "applicationCategory": "ReferenceApplication",
+      "applicationCategory": "Utility",
       "operatingSystem": "All",
       "offers": {
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "USD"
       },
-      "description": "An online AI-powered tool to identify insects, spiders, and bugs from photos.",
-      "featureList": "Image Recognition, Camera Support, Instant Analysis",
-      "screenshot": "https://yourwebsite.com/screenshot.jpg"
+      "description": "A free browser-based AI tool to identify insects and bugs from photos."
     }
     </script>
 
     <style>
         :root {
-            --primary: #2e7d32; /* Nature Green */
-            --primary-dark: #1b5e20;
-            --accent: #ff6f00; /* Amber for bugs/warning */
-            --bg-color: #f1f8e9;
-            --surface: #ffffff;
-            --text: #333333;
+            --primary: #4caf50;
+            --dark: #2e7d32;
+            --bg: #f4f9f4;
+            --text: #37474f;
+            --white: #ffffff;
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-color);
+            font-family: 'Quicksand', sans-serif;
+            background-color: var(--bg);
             color: var(--text);
             margin: 0;
             padding: 0;
-            line-height: 1.6;
         }
 
         /* Hero Section */
-        header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
+        .hero {
+            background: linear-gradient(180deg, var(--dark) 0%, var(--primary) 100%);
+            color: var(--white);
             padding: 60px 20px;
             text-align: center;
-            border-bottom-left-radius: 30px;
-            border-bottom-right-radius: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        header h1 { margin: 0; font-size: 2.5rem; font-weight: 700; }
-        header p { margin-top: 15px; font-size: 1.1rem; opacity: 0.9; }
+        .hero h1 { margin: 0; font-size: 2.5rem; font-weight: 700; }
+        .hero p { opacity: 0.9; margin-top: 10px; font-size: 1.1rem; }
 
         /* Main Container */
         .container {
-            max-width: 1000px;
+            max-width: 800px;
             margin: -40px auto 40px;
             padding: 0 20px;
-            position: relative;
+        }
+
+        /* AI Status Badge */
+        .ai-status {
+            background: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            text-align: center;
+            border-radius: 50px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border: 1px solid #ffeeba;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .ai-ready {
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
         }
 
         /* Tool Card */
-        .tool-card {
-            background: var(--surface);
-            padding: 30px;
+        .card {
+            background: var(--white);
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
             text-align: center;
         }
 
-        /* Upload Area */
-        .upload-area {
-            border: 3px dashed #cbd5e1;
-            border-radius: 15px;
-            padding: 40px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            background: #fafafa;
-        }
-
-        .upload-area:hover, .upload-area.dragover {
-            border-color: var(--primary);
-            background: #e8f5e9;
-        }
-
-        .upload-icon { font-size: 50px; color: var(--primary); margin-bottom: 15px; }
-
-        .btn-group {
+        .upload-btns {
             display: flex;
-            justify-content: center;
             gap: 15px;
+            justify-content: center;
             margin-top: 20px;
             flex-wrap: wrap;
         }
 
         .btn {
-            padding: 12px 25px;
+            padding: 12px 30px;
             border: none;
             border-radius: 50px;
-            font-weight: 600;
-            cursor: pointer;
             font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s;
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: transform 0.2s;
         }
 
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
-        
-        .btn-camera { background: var(--accent); color: white; }
-        .btn-camera:hover { background: #e65100; transform: translateY(-2px); }
+        .btn-upload { background: var(--dark); color: white; }
+        .btn-cam { background: #ff9800; color: white; }
+        .btn:hover { transform: scale(1.05); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        input[type="file"] { display: none; }
-
-        /* Preview & Result */
-        .preview-container {
+        /* Preview Area */
+        .preview-box {
             margin-top: 30px;
-            display: none; /* Hidden by default */
-        }
-
-        .preview-img {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .scanning-animation {
-            margin: 20px auto;
-            width: 100%;
-            height: 4px;
-            background: #e0e0e0;
-            border-radius: 2px;
-            position: relative;
-            overflow: hidden;
             display: none;
         }
 
-        .scanning-bar {
-            width: 40%;
-            height: 100%;
-            background: var(--primary);
-            position: absolute;
-            animation: scan 1.5s infinite linear;
+        #imagePreview {
+            max-width: 100%;
+            max-height: 350px;
+            border-radius: 10px;
+            border: 4px solid var(--bg);
         }
 
-        @keyframes scan {
-            0% { left: -40%; }
-            100% { left: 100%; }
-        }
-
-        .result-box {
-            background: #f1f8e9;
-            border-left: 5px solid var(--primary);
-            padding: 20px;
+        /* Results */
+        .results-list {
             margin-top: 20px;
-            border-radius: 8px;
             text-align: left;
-            display: none; /* Hidden by default */
+            background: var(--bg);
+            border-radius: 10px;
+            padding: 20px;
         }
 
-        .result-box h3 { margin-top: 0; color: var(--primary-dark); }
-        .match-score { float: right; background: var(--primary); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .result-item:last-child { border-bottom: none; }
+        .confidence { font-weight: bold; color: var(--dark); }
 
-        /* Content Section */
-        .content-section {
+        /* Loading Spinner */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* SEO Content */
+        .seo-content {
             margin-top: 50px;
-            background: var(--surface);
+            background: var(--white);
             padding: 40px;
             border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            line-height: 1.8;
         }
+        .seo-content h2 { color: var(--dark); }
+        .seo-content h3 { color: #555; margin-top: 30px; }
 
-        .content-section h2 { color: var(--primary-dark); }
-        .content-section h3 { color: #555; margin-top: 30px; }
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-        .feature-item { padding: 20px; border: 1px solid #eee; border-radius: 10px; }
-
-        footer {
-            text-align: center;
-            padding: 40px;
-            color: #777;
-            margin-top: 40px;
-            font-size: 0.9rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 600px) {
-            header h1 { font-size: 1.8rem; }
-            .btn-group { flex-direction: column; }
-            .btn { width: 100%; justify-content: center; }
-        }
+        footer { text-align: center; padding: 40px; color: #888; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Insect Identifier by Picture</h1>
-        <p>Identify bugs, spiders, and flying insects instantly using AI technology.</p>
-    </header>
+    <div class="hero">
+        <h1>Free Bug Identifier</h1>
+        <p>Identify insects, spiders, and bugs using AI instantly.</p>
+    </div>
 
     <div class="container">
         
-        <!-- The Tool -->
-        <div class="tool-card">
-            <div class="upload-area" id="dropZone">
-                <div class="upload-icon">🐞</div>
-                <h3>Drag & Drop an image or click to upload</h3>
-                <p>Supports JPG, PNG, WEBP</p>
-                
-                <div class="btn-group">
-                    <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
-                        📁 Upload Photo
-                    </button>
-                    <button class="btn btn-camera" onclick="document.getElementById('cameraInput').click()">
-                        📸 Use Camera
-                    </button>
-                </div>
-                
-                <input type="file" id="fileInput" accept="image/*">
-                <!-- Capture attribute opens camera on mobile -->
-                <input type="file" id="cameraInput" accept="image/*" capture="environment">
+        <div id="statusMsg" class="ai-status">⏳ Loading AI Model... Please wait.</div>
+
+        <div class="card">
+            <div style="font-size: 50px; margin-bottom: 10px;">🐞</div>
+            <h2>What insect is this?</h2>
+            <p>Upload a clear photo to get an instant identification.</p>
+
+            <div class="upload-btns">
+                <button class="btn btn-upload" id="uploadBtn" onclick="document.getElementById('fileInput').click()" disabled>
+                    📁 Upload Image
+                </button>
+                <button class="btn btn-cam" id="camBtn" onclick="document.getElementById('camInput').click()" disabled>
+                    📷 Take Photo
+                </button>
             </div>
 
-            <div class="preview-container" id="previewContainer">
-                <img id="imagePreview" class="preview-img" src="" alt="Insect Preview">
-                
-                <div class="scanning-animation" id="scanBar">
-                    <div class="scanning-bar"></div>
-                </div>
+            <!-- Inputs -->
+            <input type="file" id="fileInput" accept="image/*" style="display: none;">
+            <input type="file" id="camInput" accept="image/*" capture="environment" style="display: none;">
 
-                <div class="result-box" id="resultBox">
-                    <span class="match-score">96% Match</span>
-                    <h3>Seven-Spot Ladybug (Example)</h3>
-                    <p><strong>Scientific Name:</strong> Coccinella septempunctata</p>
-                    <p><strong>Type:</strong> Beetle (Beneficial)</p>
-                    <p><strong>Description:</strong> The most common ladybug in Europe. Its elytra are of a red colour, but punctuated with three black spots each, with one further spot being spread over the junction of the two.</p>
-                    <p style="color: #d32f2f; font-weight: bold; font-size: 0.9em; margin-top:10px;">⚠️ Note: This is a demo result. Connect an API to get real identification.</p>
-                    
-                    <button class="btn btn-primary" onclick="resetTool()" style="margin-top: 15px; width:100%;">Identify Another Bug</button>
+            <!-- Preview & Results -->
+            <div class="preview-box" id="previewBox">
+                <img id="imagePreview" src="" alt="Bug Preview">
+                
+                <div class="loader" id="loader"></div>
+                
+                <div class="results-list" id="resultsList" style="display: none;">
+                    <h3>AI Predictions:</h3>
+                    <div id="predictionContent"></div>
+                    <p style="font-size: 0.8rem; color: #777; margin-top: 10px;">
+                        * This tool uses a free AI model. Results are estimates.
+                    </p>
                 </div>
             </div>
         </div>
 
-        <!-- SEO Content -->
-        <article class="content-section">
-            <h2>Free Bug Identifier App Online</h2>
-            <p>Welcome to the ultimate <strong>Free Insect Identifier by Picture</strong> tool. Whether you are a gardener dealing with pests, a parent worried about a spider bite, or a nature enthusiast exploring the outdoors, our tool helps you identify species in seconds. Unlike many paid apps, this <strong>Insect identifier online free app</strong> runs directly in your browser.</p>
+        <!-- SEO Article -->
+        <article class="seo-content">
+            <h2>About Our Free Insect Identifier</h2>
+            <p>Discover the world of insects with our <strong>Free Bug Identifier App</strong>. Powered by Google's TensorFlow technology, this tool runs directly in your browser, ensuring your privacy and speed. There is no need to download heavy apps or pay for subscriptions.</p>
 
-            <h3>How It Works</h3>
-            <div class="feature-grid">
-                <div class="feature-item">
-                    <h4>1. Snap or Upload</h4>
-                    <p>Take a photo with your phone or upload an existing image of the bug.</p>
-                </div>
-                <div class="feature-item">
-                    <h4>2. AI Analysis</h4>
-                    <p>Our system analyzes the wing patterns, legs, and colors (like a Google insect identifier).</p>
-                </div>
-                <div class="feature-item">
-                    <h4>3. Instant Result</h4>
-                    <p>Get the name, species, and learn if the insect is harmful or beneficial.</p>
-                </div>
-            </div>
-
-            <h3>Supported Identification Categories</h3>
+            <h3>How to use the Insect Identifier by Picture?</h3>
             <ul>
-                <li><strong>Spider Identifier:</strong> Distinguish between harmless house spiders and venomous species like the Black Widow.</li>
-                <li><strong>Flying Insect Identifier:</strong> Identify bees, wasps, moths, and butterflies easily.</li>
-                <li><strong>Pest Detector:</strong> Check if that bug on your plant is an aphid or a friendly ladybug.</li>
+                <li><strong>Step 1:</strong> Wait for the "AI Model Ready" message (it loads in seconds).</li>
+                <li><strong>Step 2:</strong> Click "Take Photo" or upload an existing image.</li>
+                <li><strong>Step 3:</strong> The AI will analyze the shape and patterns to suggest the most likely bug species.</li>
             </ul>
 
-            <h3>Why Use This Tool?</h3>
-            <p>While you can use a <strong>Google bug identifier free</strong> service like Google Lens, our dedicated tool focuses purely on entomology (the study of insects). It is designed to work as a lightweight <strong>Insect identifier by photo Cam</strong> solution without requiring you to download heavy applications from the App Store.</p>
+            <h3>Why is this better than paid apps?</h3>
+            <p>Many "Insect identifier online free app" services actually require a login or limit your daily searches. Our tool uses <strong>Client-Side AI</strong>, meaning the identification happens on your device. It's truly free, unlimited, and works as a great <em>Spider identifier</em> or <em>Flying insect identifier</em>.</p>
 
-            <h3>Safety First</h3>
-            <p>Always maintain a safe distance when photographing unknown insects, especially spiders or bees. Use the zoom feature on your camera to get a clear shot for the <strong>Insect identifier by picture</strong> technology to work best.</p>
+            <h3>Supported Categories</h3>
+            <p>The AI model is trained on thousands of image classes, capable of recognizing common beetles, butterflies, bees, ants, spiders, and various other anthropods.</p>
         </article>
 
     </div>
 
     <footer>
-        <p>&copy; 2026 Free Bug Identifier. All Rights Reserved.</p>
+        <p>&copy; 2026 AI Bug ID. Powered by TensorFlow.js</p>
     </footer>
 
     <script>
+        const statusMsg = document.getElementById('statusMsg');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const camBtn = document.getElementById('camBtn');
         const fileInput = document.getElementById('fileInput');
-        const cameraInput = document.getElementById('cameraInput');
-        const dropZone = document.getElementById('dropZone');
-        const previewContainer = document.getElementById('previewContainer');
+        const camInput = document.getElementById('camInput');
+        const previewBox = document.getElementById('previewBox');
         const imagePreview = document.getElementById('imagePreview');
-        const scanBar = document.getElementById('scanBar');
-        const resultBox = document.getElementById('resultBox');
+        const loader = document.getElementById('loader');
+        const resultsList = document.getElementById('resultsList');
+        const predictionContent = document.getElementById('predictionContent');
 
-        // Handle File Selection
-        function handleFile(file) {
-            if (file) {
+        let net; // To hold the AI model
+
+        // 1. Load the MobileNet AI Model
+        async function loadAI() {
+            try {
+                net = await mobilenet.load();
+                console.log('Model loaded');
+                statusMsg.innerText = "✅ AI Model Ready! Upload a photo.";
+                statusMsg.classList.add('ai-ready');
+                uploadBtn.disabled = false;
+                camBtn.disabled = false;
+            } catch (error) {
+                console.error(error);
+                statusMsg.innerText = "⚠️ Error loading AI. Please refresh.";
+            }
+        }
+
+        // Initialize AI on page load
+        loadAI();
+
+        // 2. Handle Image Upload/Capture
+        function handleFiles(files) {
+            if (files.length > 0) {
+                const file = files[0];
                 const reader = new FileReader();
+                
                 reader.onload = function(e) {
-                    // Hide Upload Area
-                    dropZone.style.display = 'none';
-                    
-                    // Show Preview
-                    previewContainer.style.display = 'block';
+                    previewBox.style.display = 'block';
+                    resultsList.style.display = 'none';
+                    loader.style.display = 'block';
                     imagePreview.src = e.target.result;
-                    
-                    // Start Simulation
-                    startScanning();
+
+                    // Small delay to allow image to render before classification
+                    setTimeout(() => identifyImage(imagePreview), 100);
                 }
                 reader.readAsDataURL(file);
             }
         }
 
-        // Simulate AI Scanning
-        function startScanning() {
-            scanBar.style.display = 'block';
-            resultBox.style.display = 'none';
-
-            // Simulate 2.5 seconds processing time
-            setTimeout(() => {
-                scanBar.style.display = 'none';
-                resultBox.style.display = 'block';
-                // Note: In a real app, here you would fetch data from an API
-            }, 2500);
+        // 3. Identify Image using TensorFlow
+        async function identifyImage(imgElement) {
+            try {
+                // Get top 3 predictions
+                const result = await net.classify(imgElement, 3);
+                
+                displayResults(result);
+            } catch (error) {
+                console.error(error);
+                predictionContent.innerHTML = "<p>Could not identify image.</p>";
+            }
+            loader.style.display = 'none';
+            resultsList.style.display = 'block';
         }
 
-        // Reset
-        window.resetTool = function() {
-            fileInput.value = '';
-            cameraInput.value = '';
-            previewContainer.style.display = 'none';
-            dropZone.style.display = 'block';
-            resultBox.style.display = 'none';
+        // 4. Display Results
+        function displayResults(results) {
+            predictionContent.innerHTML = "";
+            results.forEach(prediction => {
+                const probability = (prediction.probability * 100).toFixed(1);
+                const name = prediction.className.split(',')[0]; // Simplify name
+
+                const item = `
+                    <div class="result-item">
+                        <span>${name}</span>
+                        <span class="confidence">${probability}%</span>
+                    </div>
+                `;
+                predictionContent.innerHTML += item;
+            });
         }
 
         // Event Listeners
-        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
-        cameraInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+        camInput.addEventListener('change', (e) => handleFiles(e.target.files));
 
-        // Drag & Drop Support
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('dragover');
-        });
-
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('dragover');
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                handleFile(files[0]);
-            }
-        });
     </script>
 </body>
 </html>
