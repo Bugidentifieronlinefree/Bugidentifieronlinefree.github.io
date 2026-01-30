@@ -1,235 +1,214 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Insect Identifier By Picture Online</title>
+    <meta name="description" content="Identify bugs instantly using AI. Free online insect identifier tool.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- TensorFlow.js Libraries -->
+    <!-- Using unpkg for better stability -->
+    <script src="https://unpkg.com/@tensorflow/tfjs@3.11.0/dist/tf.min.js"></script>
+    <script src="https://unpkg.com/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
 
-<title>Free Bug Identifier by Picture | Insect & Spider Identification Online</title>
-
-<meta name="description" content="Free bug identifier by picture. Upload or take a photo to identify insects, spiders, beetles, and flying bugs using on-device AI. No API. No app download.">
-<meta name="keywords" content="bug identifier, insect identifier by picture, free bug identifier online, spider identifier, flying insect identifier, insect identifier without api">
-<meta name="robots" content="index, follow">
-<link rel="canonical" href="https://bugidentifieronlinefree.github.io/">
-
-<!-- Google Font -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
-<!-- TensorFlow -->
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
-
-<!-- Schema -->
-<script type="application/ld+json">
-{
- "@context": "https://schema.org",
- "@type": "SoftwareApplication",
- "name": "Free Bug Identifier",
- "applicationCategory": "EducationalApplication",
- "operatingSystem": "All",
- "offers": {
-   "@type": "Offer",
-   "price": "0",
-   "priceCurrency": "USD"
- },
- "description": "Identify insects, spiders, and bugs online using AI that runs directly in your browser. No API required."
-}
-</script>
-
-<style>
-:root {
---primary:#2e7d32;
---bg:#f1f8e9;
---card:#ffffff;
---text:#333;
-}
-
-body {
-margin:0;
-font-family:Poppins,sans-serif;
-background:var(--bg);
-color:var(--text);
-}
-
-header {
-background:linear-gradient(135deg,#2e7d32,#1b5e20);
-color:#fff;
-padding:50px 20px;
-text-align:center;
-border-radius:0 0 30px 30px;
-}
-
-.container {
-max-width:1000px;
-margin:-40px auto 40px;
-padding:20px;
-}
-
-.card {
-background:var(--card);
-padding:30px;
-border-radius:20px;
-box-shadow:0 10px 30px rgba(0,0,0,.1);
-text-align:center;
-}
-
-.upload {
-border:3px dashed #bbb;
-padding:40px;
-border-radius:15px;
-cursor:pointer;
-}
-
-.upload:hover {
-background:#e8f5e9;
-border-color:var(--primary);
-}
-
-button {
-padding:12px 25px;
-margin:10px;
-border:none;
-border-radius:30px;
-background:var(--primary);
-color:#fff;
-font-weight:600;
-cursor:pointer;
-}
-
-img {
-max-width:100%;
-max-height:300px;
-margin-top:20px;
-border-radius:10px;
-display:none;
-}
-
-.result {
-margin-top:20px;
-padding:20px;
-background:#e8f5e9;
-border-left:5px solid var(--primary);
-border-radius:10px;
-display:none;
-text-align:left;
-}
-
-article {
-margin-top:50px;
-background:#fff;
-padding:40px;
-border-radius:15px;
-}
-
-footer {
-text-align:center;
-padding:30px;
-color:#777;
-font-size:.9rem;
-}
-
-@media(max-width:600px){
-button{width:100%}
-}
-</style>
+    <style>
+        /* Loading Spinner */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </head>
+<body class="flex flex-col min-h-screen bg-violet-50">
 
-<body>
+    <!-- Navbar -->
+    <nav class="bg-slate-700 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🐞</span>
+                    <span class="text-white font-bold text-lg">Insect Identifier</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                        <a href="#" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">Blog</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-<header>
-<h1>Bug Identifier by Picture</h1>
-<p>Identify insects, spiders & flying bugs using free on-device AI</p>
-</header>
+    <!-- Main Content -->
+    <main class="flex-grow py-10 px-4">
+        
+        <!-- AI Status -->
+        <div id="status-bar" class="max-w-xl mx-auto mb-6 text-center p-3 rounded-lg bg-yellow-100 text-yellow-800 border border-yellow-200 font-semibold shadow-sm">
+            ⏳ Connecting to AI Server...
+        </div>
 
-<div class="container">
+        <!-- Hero Card -->
+        <div class="relative py-3 sm:max-w-xl sm:mx-auto">
+            <div class="absolute inset-0 bg-gradient-to-r from-cyan-400 to-light-blue-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
+            
+            <div class="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
+                <div class="max-w-md mx-auto text-center">
+                    <h1 class="text-2xl font-bold mb-6 text-gray-800">Insect Identifier By Picture</h1>
+                    
+                    <div class="flex flex-col sm:flex-row justify-center gap-4 mb-6">
+                        <button id="cam-btn" onclick="document.getElementById('camera-input').click()" disabled 
+                            class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 shadow transition disabled:opacity-50 disabled:cursor-not-allowed font-semibold">
+                            📸 Use Camera
+                        </button>
+                        <button id="upload-btn" onclick="document.getElementById('file-input').click()" disabled
+                            class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 shadow transition disabled:opacity-50 disabled:cursor-not-allowed font-semibold">
+                            📁 Upload Image
+                        </button>
+                    </div>
 
-<div class="card upload" onclick="fileInput.click()">
-<p>📷 Upload or take a photo of the bug</p>
-<button>Upload Photo</button>
-<button onclick="event.stopPropagation(); cameraInput.click()">Use Camera</button>
-<input type="file" id="fileInput" accept="image/*" hidden>
-<input type="file" id="cameraInput" accept="image/*" capture="environment" hidden>
-</div>
+                    <input type="file" id="file-input" class="hidden" accept="image/*">
+                    <input type="file" id="camera-input" class="hidden" accept="image/*" capture="environment">
 
-<img id="preview">
-<div class="result" id="result"></div>
+                    <div id="preview-area" class="hidden mt-6 border-t pt-4">
+                        <img id="uploaded-image" class="w-full h-64 object-contain rounded-lg shadow-sm mb-4" src="" alt="Bug" crossorigin="anonymous">
+                        <div class="loader" id="loader"></div>
+                        <div id="result-box" class="text-left bg-gray-50 p-4 rounded-lg border"></div>
+                    </div>
 
-<article>
-<h2>Free Insect Identifier Online</h2>
-<p>
-This <strong>free bug identifier by picture</strong> helps you recognize insects, spiders,
-beetles, butterflies, and flying bugs directly from your browser.
-No app download. No API. No tracking.
-</p>
+                </div>
+            </div>
+        </div>
 
-<h3>How It Works</h3>
-<ul>
-<li>Upload or capture a bug photo</li>
-<li>AI runs locally on your device</li>
-<li>Get instant insect classification</li>
-</ul>
+        <!-- SEO Content -->
+        <div class="mt-12 max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-sm">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">How to Use the Insect Identifier</h2>
+            <ol class="list-decimal list-inside space-y-2 text-gray-600">
+                <li><strong>Capture or Upload:</strong> Click the buttons above to provide an image.</li>
+                <li><strong>AI Analysis:</strong> Our smart tool analyzes the wings, legs, and colors using MobileNet technology.</li>
+                <li><strong>Get Results:</strong> Instantly see the name of the insect and confidence score.</li>
+            </ol>
 
-<h3>Supported Categories</h3>
-<ul>
-<li>Spider Identifier</li>
-<li>Flying Insect Identifier</li>
-<li>Beetles & Bugs</li>
-<li>Butterflies & Moths</li>
-</ul>
+            <h2 class="text-2xl font-bold mt-8 mb-4 text-gray-800">FAQ</h2>
+            <div class="space-y-4">
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <h3 class="font-bold text-gray-800">Is this tool free?</h3>
+                    <p class="text-gray-600 text-sm mt-1">Yes, 100% free and runs directly in your browser.</p>
+                </div>
+            </div>
+        </div>
 
-<h3>Privacy Friendly</h3>
-<p>
-All analysis happens directly on your device.
-Images are never uploaded to a server.
-</p>
+    </main>
 
-<h3>Important Disclaimer</h3>
-<p>
-Results are approximate and for educational purposes only.
-Do not rely on this tool for medical or pest control decisions.
-</p>
-</article>
+    <footer class="bg-slate-800 text-white py-8 text-center mt-auto">
+        <p class="text-sm">© 2024 Insect Identifier. All rights reserved.</p>
+    </footer>
 
-</div>
+    <!-- Logic Script -->
+    <script>
+        const statusBar = document.getElementById('status-bar');
+        const uploadBtn = document.getElementById('upload-btn');
+        const camBtn = document.getElementById('cam-btn');
+        const previewArea = document.getElementById('preview-area');
+        const imgEl = document.getElementById('uploaded-image');
+        const resultBox = document.getElementById('result-box');
+        const loader = document.getElementById('loader');
+        
+        let model;
 
-<footer>
-© 2024 Free Bug Identifier – No API Required
-</footer>
+        // --- FIX: Use Google Storage Direct URL to bypass CORS/Blocking ---
+        // This URL is much more stable than tfhub.dev
+        const MODEL_URL = 'https://storage.googleapis.com/tfjs-models/savedmodel/mobilenet_v1_1.0_224/model.json';
 
-<script>
-let model;
-const preview=document.getElementById("preview");
-const result=document.getElementById("result");
+        async function loadModel() {
+            try {
+                // Initialize TensorFlow
+                await tf.ready();
+                
+                // Load model from the direct URL
+                model = await mobilenet.load({
+                    version: 1,
+                    alpha: 1.0,
+                    modelUrl: MODEL_URL
+                });
+                
+                // Success State
+                statusBar.innerHTML = "✅ AI System Ready & Online!";
+                statusBar.className = "max-w-xl mx-auto mb-6 text-center p-3 rounded-lg bg-green-100 text-green-800 border border-green-200 font-bold shadow-sm";
+                
+                uploadBtn.disabled = false;
+                camBtn.disabled = false;
+                console.log("Model Loaded Successfully from Storage Bucket");
 
-mobilenet.load().then(m=>model=m);
+            } catch (err) {
+                console.error("Critical AI Error:", err);
+                statusBar.innerHTML = `⚠️ Network Error. <button onclick="location.reload()" class="underline font-bold ml-2">Click to Retry</button>`;
+                statusBar.className = "max-w-xl mx-auto mb-6 text-center p-3 rounded-lg bg-red-100 text-red-800 border border-red-200 shadow-sm";
+            }
+        }
+        
+        loadModel();
 
-function handle(file){
-const reader=new FileReader();
-reader.onload=e=>{
-preview.src=e.target.result;
-preview.style.display="block";
-result.style.display="block";
-result.innerHTML="🔍 Analyzing image...";
-setTimeout(()=>classify(),800);
-}
-reader.readAsDataURL(file);
-}
+        // Handle Image Upload
+        function handleFile(file) {
+            if(!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewArea.classList.remove('hidden');
+                imgEl.src = e.target.result;
+                resultBox.innerHTML = '';
+                loader.style.display = 'block';
+                
+                // Small delay to ensure image renders
+                setTimeout(predict, 500);
+            };
+            reader.readAsDataURL(file);
+        }
 
-async function classify(){
-const preds=await model.classify(preview);
-const insectWords=["spider","beetle","butterfly","moth","bee","wasp","ant","mosquito","insect"];
-let found=preds.find(p=>insectWords.some(w=>p.className.toLowerCase().includes(w)));
-if(!found) found=preds[0];
+        document.getElementById('file-input').addEventListener('change', (e) => handleFile(e.target.files[0]));
+        document.getElementById('camera-input').addEventListener('change', (e) => handleFile(e.target.files[0]));
 
-result.innerHTML=`
-<h3>${found.className}</h3>
-<p><strong>Confidence:</strong> ${(found.probability*100).toFixed(1)}%</p>
-<p>Identification is based on on-device AI and may not be 100% accurate.</p>
-`;
-}
+        // Prediction Logic
+        async function predict() {
+            if(!model) return;
+            try {
+                const predictions = await model.classify(imgEl, 3);
+                
+                resultBox.innerHTML = '<h3 class="font-bold mb-3 text-lg border-b pb-2">Identification Results:</h3>';
+                
+                if (predictions && predictions.length > 0) {
+                    predictions.forEach(p => {
+                        const percent = (p.probability * 100).toFixed(1);
+                        // Clean up names
+                        const name = p.className.split(',')[0];
+                        
+                        resultBox.innerHTML += `
+                            <div class="flex justify-between items-center py-2 border-b last:border-0 hover:bg-gray-100 px-2 rounded">
+                                <span class="capitalize text-gray-800 font-medium">${name}</span>
+                                <span class="text-blue-600 font-bold">${percent}%</span>
+                            </div>
+                        `;
+                    });
+                } else {
+                    resultBox.innerHTML = '<p>No matching insect found.</p>';
+                }
 
-fileInput.onchange=e=>handle(e.target.files[0]);
-cameraInput.onchange=e=>handle(e.target.files[0]);
-</script>
-
+            } catch (err) {
+                console.error(err);
+                resultBox.innerHTML = '<p class="text-red-500 font-bold">Could not analyze image. Try a different photo.</p>';
+            }
+            loader.style.display = 'none';
+        }
+    </script>
 </body>
 </html>
