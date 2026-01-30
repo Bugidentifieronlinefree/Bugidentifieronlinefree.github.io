@@ -3,23 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Insect Identifier by Picture | AI Bug & Spider ID Online</title>
-    <meta name="description" content="Identify insects, bugs, and spiders instantly with our Free AI Insect Identifier. Upload a photo or use your camera. No app download required. Fast & Accurate.">
+    <title>Free Insect Identifier by Picture | Instant AI Bug ID Camera</title>
+    <meta name="description" content="Identify bugs, spiders, and insects instantly with our Free AI Insect Identifier. Upload a photo or use your camera. No app download needed. Fast & Accurate results.">
     <meta name="keywords" content="bug identifier, insect identifier, spider identifier, insect identifier by picture, free bug identifier app, insect identifier by photo cam, google insect identifier, flying insect identifier">
     <meta name="author" content="Bug Identifier Online">
     <meta name="robots" content="index, follow">
     
-    <!-- Canonical URL (Important for SEO) -->
+    <!-- Canonical URL -->
     <link rel="canonical" href="https://bugidentifieronlinefree.github.io/" />
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-    <!-- Stable TensorFlow Libraries (Fixes Loading Errors) -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
 
     <!-- Schema Markup -->
     <script type="application/ld+json">
@@ -40,10 +36,20 @@
     }
     </script>
 
+    <!-- 
+       SOLUTION FOR LOADING ERRORS:
+       1. Using 'unpkg' CDN (More stable).
+       2. TensorFlow.js version 3.11.0 (Most compatible).
+    -->
+    <script src="https://unpkg.com/@tensorflow/tfjs@3.11.0/dist/tf.min.js"></script>
+    <script src="https://unpkg.com/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
+
     <style>
         :root {
-            --primary: #16a34a; /* Green-600 */
+            --primary: #16a34a; /* Nature Green */
             --primary-hover: #15803d;
+            --error-bg: #fee2e2;
+            --error-text: #991b1b;
             --bg-color: #f0fdf4;
             --surface: #ffffff;
             --text-main: #1f2937;
@@ -94,18 +100,22 @@
             position: relative;
         }
 
-        /* AI Status Bar */
+        /* Status Bar */
         #status-bar {
             background: #fffbeb;
             border: 1px solid #fcd34d;
             color: #92400e;
-            padding: 12px;
+            padding: 15px;
             border-radius: 8px;
             text-align: center;
             font-weight: 600;
             margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
         }
 
         #status-bar.ready {
@@ -113,6 +123,18 @@
             border-color: #86efac;
             color: #166534;
         }
+
+        .retry-btn {
+            padding: 5px 12px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #333;
+        }
+        .retry-btn:hover { background: #f3f3f3; }
 
         /* App Card */
         .app-card {
@@ -133,7 +155,7 @@
             margin-top: 25px;
         }
 
-        button {
+        button.action-btn {
             padding: 14px 28px;
             border: none;
             border-radius: 50px;
@@ -160,7 +182,7 @@
             margin-top: 30px;
             border-top: 1px solid var(--border);
             padding-top: 30px;
-            display: none; /* Hidden initially */
+            display: none;
         }
 
         #uploaded-image {
@@ -202,7 +224,7 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* SEO Content */
+        /* Content Section */
         .content-section {
             background: var(--surface);
             padding: 40px;
@@ -228,7 +250,7 @@
         @media (max-width: 600px) {
             header h1 { font-size: 1.8rem; }
             .btn-group { flex-direction: column; }
-            button { width: 100%; justify-content: center; }
+            button.action-btn { width: 100%; justify-content: center; }
         }
     </style>
 </head>
@@ -241,8 +263,8 @@
 
     <div class="container">
         
-        <!-- Status Bar -->
-        <div id="status-bar">⏳ Loading AI Model... Please wait.</div>
+        <!-- Smart Status Bar -->
+        <div id="status-bar">⏳ Initializing Neural Network...</div>
 
         <!-- Tool Interface -->
         <div class="app-card">
@@ -251,10 +273,10 @@
             <p>Snap a photo or upload an image to identify the species instantly.</p>
 
             <div class="btn-group">
-                <button class="btn-upload" id="upload-btn" onclick="document.getElementById('file-input').click()" disabled>
+                <button class="action-btn btn-upload" id="upload-btn" onclick="document.getElementById('file-input').click()" disabled>
                     📁 Upload Image
                 </button>
-                <button class="btn-camera" id="camera-btn" onclick="document.getElementById('camera-input').click()" disabled>
+                <button class="action-btn btn-camera" id="camera-btn" onclick="document.getElementById('camera-input').click()" disabled>
                     📸 Use Camera
                 </button>
             </div>
@@ -306,7 +328,7 @@
     </div>
 
     <footer>
-        <p>&copy; 2024 Bug Identifier Online. Powered by TensorFlow.js</p>
+        <p>&copy; 2026 Bug Identifier Online. Powered by TensorFlow.js</p>
     </footer>
 
     <!-- Logic Script -->
@@ -323,72 +345,101 @@
 
         let model;
 
-        // 1. Initialize AI Model
+        // --- Helper: Show Retry Button ---
+        function showRetryButton(msg) {
+            statusBar.innerHTML = `⚠️ ${msg} <button class="retry-btn" onclick="loadModel()">🔄 Retry</button>`;
+            statusBar.style.backgroundColor = "#fee2e2";
+            statusBar.style.borderColor = "#f87171";
+            statusBar.style.color = "#991b1b";
+        }
+
+        // --- 1. Load AI Model (The Improved Logic) ---
         async function loadModel() {
             try {
-                // Using explicit version to avoid 'latest' errors
-                model = await mobilenet.load({ version: 2, alpha: 1.0 });
-                
-                // UI Updates on Success
-                statusBar.innerText = "✅ AI System Ready. Start Scanning!";
+                // Reset UI
+                statusBar.innerHTML = "⏳ Initializing Neural Network...";
+                statusBar.style.backgroundColor = "#fffbeb";
+                statusBar.style.borderColor = "#fcd34d";
+                statusBar.style.color = "#92400e";
+
+                // Wait for TensorFlow to fully Initialize
+                await tf.ready();
+
+                // Load MobileNet Version 1 (Lighter & Faster than V2)
+                // 'alpha: 1.0' balances speed and accuracy
+                model = await mobilenet.load({ version: 1, alpha: 1.0 });
+
+                // Success UI
+                statusBar.innerText = "✅ AI System Online & Ready!";
                 statusBar.classList.add('ready');
                 uploadBtn.disabled = false;
                 cameraBtn.disabled = false;
-                console.log("Model loaded successfully");
+                console.log("Model loaded successfully.");
+
             } catch (error) {
-                console.error("Failed to load model:", error);
-                statusBar.innerText = "⚠️ Error loading AI. Check your connection.";
+                console.error("Model Load Error:", error);
+                
+                let userMsg = "Connection Error.";
+                if(error.message.includes("fetch")) userMsg = "Network Blocked.";
+                if(error.message.includes("WebGL")) userMsg = "Graphics Error.";
+
+                showRetryButton(userMsg);
             }
         }
 
+        // Start Loading immediately
         loadModel();
 
-        // 2. Handle Input Files
+        // --- 2. Handle Inputs ---
         function processFile(file) {
             if (!file) return;
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                // Reset UI
+                // UI Reset
                 previewArea.style.display = 'block';
                 uploadedImage.src = e.target.result;
                 resultsBox.innerHTML = '';
                 loadingSpinner.style.display = 'block';
 
-                // Small delay to render image before processing
+                // Delay slightly to let image render
                 setTimeout(() => predictBug(), 500);
             };
             reader.readAsDataURL(file);
         }
 
-        // 3. Predict Function
+        // --- 3. Predict ---
         async function predictBug() {
-            if (!model) return;
+            if (!model) {
+                alert("AI Model is not ready. Please check your connection.");
+                loadingSpinner.style.display = 'none';
+                return;
+            }
 
             try {
-                // Get top 3 predictions
+                // Classify image
                 const predictions = await model.classify(uploadedImage, 3);
                 displayResults(predictions);
             } catch (err) {
                 console.error(err);
-                resultsBox.innerHTML = '<p style="color:red">Could not identify. Try a clearer photo.</p>';
+                resultsBox.innerHTML = '<p style="color:red">Could not analyze. Try a different image.</p>';
             }
             loadingSpinner.style.display = 'none';
         }
 
-        // 4. Render Results
+        // --- 4. Display Results ---
         function displayResults(predictions) {
             resultsBox.innerHTML = '';
 
             if(!predictions || predictions.length === 0) {
-                resultsBox.innerHTML = '<p>No bug detected.</p>';
+                resultsBox.innerHTML = '<p>No bug detected or confidence too low.</p>';
                 return;
             }
 
             predictions.forEach(pred => {
                 const probability = (pred.probability * 100).toFixed(1);
-                // Clean up the class name (remove extra commas/synonyms for cleaner UI)
-                const name = pred.className.split(',')[0]; 
+                // Clean name (remove comma separated synonyms)
+                const name = pred.className.split(',')[0];
 
                 const div = document.createElement('div');
                 div.className = 'result-row';
@@ -403,7 +454,6 @@
         // Event Listeners
         fileInput.addEventListener('change', (e) => processFile(e.target.files[0]));
         cameraInput.addEventListener('change', (e) => processFile(e.target.files[0]));
-
     </script>
 </body>
 </html>
