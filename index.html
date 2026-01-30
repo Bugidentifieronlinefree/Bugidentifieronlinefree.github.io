@@ -1,294 +1,202 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Insect Identifier by Picture | Instant AI Bug ID Camera</title>
-    <meta name="description" content="Identify bugs, spiders, and insects instantly with our Free AI Insect Identifier. Upload a photo or use your camera. No app download needed. Fast & Accurate results.">
-    <meta name="keywords" content="bug identifier, insect identifier, spider identifier, insect identifier by picture, free bug identifier app, insect identifier by photo cam, google insect identifier, flying insect identifier">
-    <meta name="author" content="Bug Identifier Online">
-    <meta name="robots" content="index, follow">
+    <title>Free Insect Identifier By Picture Online</title>
+    <meta name="description" content="Identify bugs instantly using AI. Free online insect identifier tool.">
     
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://bugidentifieronlinefree.github.io/" />
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
-    <!-- Schema Markup -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "Smart Insect Finder",
-      "url": "https://bugidentifieronlinefree.github.io/",
-      "applicationCategory": "EducationalApplication",
-      "operatingSystem": "All",
-      "description": "A logic-based tool to identify insects based on physical attributes."
-    }
-    </script>
+    <!-- Tailwind CSS (لنسخ نفس التصميم الجذاب) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- TensorFlow.js (ذكاء اصطناعي مستقر) -->
+    <script src="https://unpkg.com/@tensorflow/tfjs@3.11.0/dist/tf.min.js"></script>
+    <script src="https://unpkg.com/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
 
     <style>
-        :root {
-            --primary: #2d6a4f;
-            --accent: #d8f3dc;
-            --bg: #f4f9f4;
-            --text: #1b4332;
-            --card-bg: #ffffff;
+        /* تأثير التحميل */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
         }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-        }
-
-        /* Hero */
-        header {
-            background: linear-gradient(135deg, #1b4332 0%, #40916c 100%);
-            color: white;
-            padding: 50px 20px;
-            text-align: center;
-        }
-
-        header h1 { margin: 0; font-size: 2.2rem; }
-        header p { opacity: 0.9; margin-top: 10px; }
-
-        /* Container */
-        .container {
-            max-width: 800px;
-            margin: -30px auto 40px;
-            padding: 0 20px;
-        }
-
-        /* Tool Card */
-        .finder-card {
-            background: var(--card-bg);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1rem;
-            background: white;
-            cursor: pointer;
-        }
-
-        select:focus { border-color: var(--primary); outline: none; }
-
-        .btn-find {
-            width: 100%;
-            padding: 15px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .btn-find:hover { background: #1b4332; }
-
-        /* Results Area */
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .bug-card {
-            background: white;
-            border: 1px solid #eee;
-            border-radius: 10px;
-            overflow: hidden;
-            transition: transform 0.2s;
-            text-align: center;
-            padding-bottom: 15px;
-        }
-
-        .bug-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-
-        .bug-emoji {
-            font-size: 60px;
-            background: var(--accent);
-            padding: 20px 0;
-            margin-bottom: 10px;
-        }
-
-        .bug-name { font-weight: bold; color: var(--primary); font-size: 1.1rem; }
-        .bug-desc { font-size: 0.85rem; color: #666; padding: 0 10px; }
-
-        /* SEO Content */
-        .content {
-            margin-top: 50px;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-        }
-        
-        .no-result {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 20px;
-            background: #ffebee;
-            color: #c62828;
-            border-radius: 8px;
-        }
-
-        footer { text-align: center; padding: 40px; color: #777; font-size: 0.9rem; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body>
+<body class="flex flex-col min-h-screen bg-violet-50">
 
-    <header>
-        <h1>Smart Insect Finder</h1>
-        <p>Identify bugs by answering 3 simple questions. Fast & Offline.</p>
-    </header>
+    <!-- Navbar -->
+    <nav class="bg-slate-700 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🐞</span>
+                    <span class="text-white font-bold text-lg">Insect Identifier</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                        <a href="#" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">Blog</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-    <div class="container">
+    <!-- Main Content -->
+    <main class="flex-grow py-10 px-4">
         
-        <div class="finder-card">
-            <div class="form-group">
-                <label>1. Main Color?</label>
-                <select id="color">
-                    <option value="any">Any Color</option>
-                    <option value="red">Red / Orange</option>
-                    <option value="black">Black / Dark</option>
-                    <option value="green">Green</option>
-                    <option value="yellow">Yellow / Striped</option>
-                    <option value="brown">Brown</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>2. Number of Legs?</label>
-                <select id="legs">
-                    <option value="any">Not Sure</option>
-                    <option value="6">6 Legs (Insect)</option>
-                    <option value="8">8 Legs (Spider)</option>
-                    <option value="many">Many (Worm/Centipede)</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>3. Does it have wings / fly?</label>
-                <select id="wings">
-                    <option value="any">Not Sure</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                </select>
-            </div>
-
-            <button class="btn-find" onclick="findBugs()">🔍 Identify Bug</button>
-            
-            <div id="results" class="results-grid"></div>
+        <!-- AI Status -->
+        <div id="status-bar" class="max-w-xl mx-auto mb-6 text-center p-3 rounded-lg bg-yellow-100 text-yellow-800 border border-yellow-200 font-semibold">
+            ⏳ Loading AI Model... Please wait.
         </div>
 
-        <article class="content">
-            <h2>How to identify insects without a camera?</h2>
-            <p>Sometimes taking a photo isn't possible, or AI tools fail due to bad internet connection. That's why our <strong>Smart Insect Finder</strong> is the perfect alternative. By selecting simple physical traits like color and number of legs, you can narrow down the possibilities instantly.</p>
+        <!-- Hero Card (Designed like the original) -->
+        <div class="relative py-3 sm:max-w-xl sm:mx-auto">
+            <!-- Background Gradient Decoration -->
+            <div class="absolute inset-0 bg-gradient-to-r from-cyan-400 to-light-blue-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
             
-            <h3>Common Bugs in our Database</h3>
-            <ul>
-                <li><strong>Ladybugs:</strong> Red beetles with black spots.</li>
-                <li><strong>Spiders:</strong> 8-legged arachnids like the Black Widow.</li>
-                <li><strong>Bees & Wasps:</strong> Flying insects known for their yellow/black stripes.</li>
-            </ul>
-        </article>
+            <!-- White Card -->
+            <div class="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
+                <div class="max-w-md mx-auto text-center">
+                    <h1 class="text-2xl font-bold mb-6 text-gray-800">Insect Identifier By Picture</h1>
+                    
+                    <div class="flex flex-col sm:flex-row justify-center gap-4 mb-6">
+                        <button id="cam-btn" onclick="document.getElementById('camera-input').click()" disabled 
+                            class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 shadow transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            📸 Use Camera
+                        </button>
+                        <button id="upload-btn" onclick="document.getElementById('file-input').click()" disabled
+                            class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 shadow transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            📁 Upload Image
+                        </button>
+                    </div>
 
-    </div>
+                    <!-- Hidden Inputs -->
+                    <input type="file" id="file-input" class="hidden" accept="image/*">
+                    <input type="file" id="camera-input" class="hidden" accept="image/*" capture="environment">
 
-    <footer>
-        <p>&copy; 2024 Smart Insect Identifier. Reliable & Offline.</p>
+                    <!-- Preview Section -->
+                    <div id="preview-area" class="hidden mt-6 border-t pt-4">
+                        <img id="uploaded-image" class="w-full h-64 object-contain rounded-lg shadow-sm mb-4" src="" alt="Bug">
+                        <div class="loader" id="loader"></div>
+                        <div id="result-box" class="text-left bg-gray-50 p-4 rounded-lg border"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Content / SEO Section -->
+        <div class="mt-12 max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-sm">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">How to Use the Insect Identifier</h2>
+            <ol class="list-decimal list-inside space-y-2 text-gray-600">
+                <li><strong>Capture or Upload:</strong> Click the buttons above to provide an image.</li>
+                <li><strong>AI Analysis:</strong> Our smart tool analyzes the wings, legs, and colors.</li>
+                <li><strong>Get Results:</strong> Instantly see the name of the insect and confidence score.</li>
+            </ol>
+
+            <h2 class="text-2xl font-bold mt-8 mb-4 text-gray-800">FAQ</h2>
+            <div class="space-y-4">
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <h3 class="font-bold text-gray-800">Is this tool free?</h3>
+                    <p class="text-gray-600 text-sm mt-1">Yes, 100% free and runs directly in your browser.</p>
+                </div>
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <h3 class="font-bold text-gray-800">How accurate is it?</h3>
+                    <p class="text-gray-600 text-sm mt-1">It uses MobileNet technology, which is very effective for common species.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 text-white py-8 text-center mt-auto">
+        <p class="text-sm">© 2024 Insect Identifier. All rights reserved.</p>
+        <p class="text-xs text-gray-400 mt-2">Powered by TensorFlow.js</p>
     </footer>
 
+    <!-- JavaScript Logic -->
     <script>
-        // Database of Bugs (Stored locally - No Network needed)
-        const bugsDB = [
-            { name: "Ladybug", color: "red", legs: "6", wings: "yes", emoji: "🐞", desc: "Small red beetle with black spots. Beneficial for gardens." },
-            { name: "Ant", color: "black", legs: "6", wings: "no", emoji: "🐜", desc: "Social insect living in colonies. Very strong." },
-            { name: "Ant", color: "red", legs: "6", wings: "no", emoji: "🐜", desc: "Fire ant. Can sting painfully." },
-            { name: "Honey Bee", color: "yellow", legs: "6", wings: "yes", emoji: "🐝", desc: "Fuzzy striped insect. Produces honey." },
-            { name: "Wasp/Hornet", color: "yellow", legs: "6", wings: "yes", emoji: "🐝", desc: "Smooth body, aggressive if provoked." },
-            { name: "Spider", color: "black", legs: "8", wings: "no", emoji: "🕷️", desc: "8 legs. Spins webs. Common house spider." },
-            { name: "Spider", color: "brown", legs: "8", wings: "no", emoji: "🕷️", desc: "Wolf spider or Huntsman. Fast runner." },
-            { name: "Grasshopper", color: "green", legs: "6", wings: "yes", emoji: "🦗", desc: "Long hind legs for jumping. Eats plants." },
-            { name: "Praying Mantis", color: "green", legs: "6", wings: "yes", emoji: "🦗", desc: "Large predatory insect. Prayer-like stance." },
-            { name: "Butterfly", color: "red", legs: "6", wings: "yes", emoji: "🦋", desc: "Beautiful wings. Monarch or similar." },
-            { name: "Butterfly", color: "yellow", legs: "6", wings: "yes", emoji: "🦋", desc: "Swallowtail or Sulphur butterfly." },
-            { name: "Butterfly", color: "black", legs: "6", wings: "yes", emoji: "🦋", desc: "Dark wings with patterns." },
-            { name: "Mosquito", color: "black", legs: "6", wings: "yes", emoji: "🦟", desc: "Small flying insect. Bites and drinks blood." },
-            { name: "Cockroach", color: "brown", legs: "6", wings: "yes", emoji: "🪳", desc: "Fast runner. Found in kitchens/dark places." },
-            { name: "Caterpillar", color: "green", legs: "many", wings: "no", emoji: "🐛", desc: "Larva of a butterfly. Eats leaves." },
-            { name: "Centipede", color: "brown", legs: "many", wings: "no", emoji: "🐛", desc: "Long body with many legs. Fast mover." },
-            { name: "Scorpion", color: "yellow", legs: "8", wings: "no", emoji: "🦂", desc: "Arachnid with a stinging tail. Desert dweller." },
-            { name: "Scorpion", color: "black", legs: "8", wings: "no", emoji: "🦂", desc: "Large scorpion. Stings can be painful." },
-            { name: "Beetle", color: "green", legs: "6", wings: "yes", emoji: "🪲", desc: "Hard shell. June bug or Japanese beetle." },
-            { name: "Fly", color: "black", legs: "6", wings: "yes", emoji: "🪰", desc: "Common house fly. Buzzing sound." }
-        ];
+        const statusBar = document.getElementById('status-bar');
+        const uploadBtn = document.getElementById('upload-btn');
+        const camBtn = document.getElementById('cam-btn');
+        const previewArea = document.getElementById('preview-area');
+        const imgEl = document.getElementById('uploaded-image');
+        const resultBox = document.getElementById('result-box');
+        const loader = document.getElementById('loader');
+        
+        let model;
 
-        function findBugs() {
-            const color = document.getElementById('color').value;
-            const legs = document.getElementById('legs').value;
-            const wings = document.getElementById('wings').value;
-            const resultsDiv = document.getElementById('results');
-
-            resultsDiv.innerHTML = ""; // Clear previous results
-
-            // Filter Logic
-            const matches = bugsDB.filter(bug => {
-                const matchColor = (color === 'any') || (bug.color === color);
-                const matchLegs = (legs === 'any') || (bug.legs === legs);
-                const matchWings = (wings === 'any') || (bug.wings === wings);
-                return matchColor && matchLegs && matchWings;
-            });
-
-            // Display Results
-            if (matches.length > 0) {
-                matches.forEach(bug => {
-                    const card = `
-                        <div class="bug-card">
-                            <div class="bug-emoji">${bug.emoji}</div>
-                            <div class="bug-name">${bug.name}</div>
-                            <div class="bug-desc">${bug.desc}</div>
-                        </div>
-                    `;
-                    resultsDiv.innerHTML += card;
-                });
-            } else {
-                resultsDiv.innerHTML = `
-                    <div class="no-result">
-                        <h3>No exact match found 🤔</h3>
-                        <p>Try changing one of the filters to "Any" or "Not Sure".</p>
-                        <a href="https://www.google.com/search?q=identify+insect+${color}+color" target="_blank" style="color:#d32f2f; text-decoration:underline;">Search Google Images instead</a>
-                    </div>
-                `;
+        // 1. Load AI
+        async function loadModel() {
+            try {
+                await tf.ready();
+                model = await mobilenet.load({ version: 1, alpha: 1.0 });
+                
+                statusBar.innerHTML = "✅ AI System Ready!";
+                statusBar.className = "max-w-xl mx-auto mb-6 text-center p-3 rounded-lg bg-green-100 text-green-800 border border-green-200 font-bold";
+                
+                uploadBtn.disabled = false;
+                camBtn.disabled = false;
+            } catch (err) {
+                console.error(err);
+                statusBar.innerHTML = `⚠️ Error: ${err.message}. <button onclick="location.reload()" class="underline">Retry</button>`;
+                statusBar.className = "max-w-xl mx-auto mb-6 text-center p-3 rounded-lg bg-red-100 text-red-800 border border-red-200";
             }
         }
+        loadModel();
 
-        // Run search on load to show something
-        findBugs();
+        // 2. Handle Image
+        function handleFile(file) {
+            if(!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewArea.classList.remove('hidden');
+                imgEl.src = e.target.result;
+                resultBox.innerHTML = '';
+                loader.style.display = 'block';
+                
+                // Predict after image render
+                setTimeout(predict, 500);
+            };
+            reader.readAsDataURL(file);
+        }
 
+        document.getElementById('file-input').addEventListener('change', (e) => handleFile(e.target.files[0]));
+        document.getElementById('camera-input').addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+        // 3. Predict
+        async function predict() {
+            if(!model) return;
+            try {
+                const predictions = await model.classify(imgEl, 3);
+                
+                resultBox.innerHTML = '<h3 class="font-bold mb-2 text-lg">Results:</h3>';
+                predictions.forEach(p => {
+                    const percent = (p.probability * 100).toFixed(1);
+                    const name = p.className.split(',')[0];
+                    
+                    resultBox.innerHTML += `
+                        <div class="flex justify-between items-center py-2 border-b last:border-0">
+                            <span class="capitalize text-gray-800 font-medium">${name}</span>
+                            <span class="text-blue-600 font-bold">${percent}%</span>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                resultBox.innerHTML = '<p class="text-red-500">Could not identify image.</p>';
+            }
+            loader.style.display = 'none';
+        }
     </script>
 </body>
 </html>
