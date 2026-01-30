@@ -42,12 +42,6 @@
           <span class="text-2xl">🐞</span>
           <span class="text-white font-bold text-lg">Insect Identifier</span>
         </div>
-        <div class="hidden md:block">
-          <div class="ml-10 flex items-baseline space-x-4">
-            <a href="#" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">Home</a>
-            <a href="#" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">Blog</a>
-          </div>
-        </div>
       </div>
     </div>
   </nav>
@@ -166,38 +160,35 @@
     const imgEl = document.getElementById('uploaded-image');
     const resultBox = document.getElementById('result-box');
     const loader = document.getElementById('loader');
-    
-    let model;
 
+    let model;
+    const MODEL_URL = 'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_1.0_224/model.json';
     const insectKeywords = ['ant','bee','beetle','butterfly','moth','grasshopper','mosquito','spider','wasp'];
 
-    async function getModel() {
-      if(model) return model;
-      statusBar.innerHTML = "⏳ Loading AI Model...";
-      await tf.ready();
-      model = await mobilenet.load({ version: 1, alpha: 1.0 });
-      statusBar.innerHTML = "✅ AI System Ready & Online!";
-      statusBar.className = "max-w-xl mx-auto mb-6 text-center p-3 rounded-lg bg-green-100 text-green-800 border border-green-200 font-bold shadow-sm";
-      uploadBtn.disabled = false;
-      camBtn.disabled = false;
-      console.log("Model loaded");
-      return model;
+    async function loadModel() {
+      try {
+        statusBar.innerHTML = "⏳ Loading AI Model...";
+        await tf.ready();
+        model = await mobilenet.load({ version: 1, alpha: 1.0, modelUrl: MODEL_URL });
+        statusBar.innerHTML = "✅ AI System Ready & Online!";
+        statusBar.className = "max-w-xl mx-auto mb-6 text-center p-3 rounded-lg bg-green-100 text-green-800 border border-green-200 font-bold shadow-sm";
+        uploadBtn.disabled = false;
+        camBtn.disabled = false;
+        console.log("Model loaded successfully");
+      } catch(err) {
+        console.error(err);
+        statusBar.innerHTML = '⚠️ Failed to load AI Model. <button onclick="location.reload()" class="underline font-bold ml-2">Retry</button>';
+        statusBar.className = "max-w-xl mx-auto mb-6 text-center p-3 rounded-lg bg-red-100 text-red-800 border border-red-200 shadow-sm";
+      }
     }
 
     async function predict() {
       if(!model) return;
       try {
-        // Resize image for faster prediction
         const predictions = await model.classify(imgEl, 5);
-
-        // Filter insect results
-        const insectResults = predictions.filter(p => 
-          insectKeywords.some(k => p.className.toLowerCase().includes(k))
-        );
-
+        const insectResults = predictions.filter(p => insectKeywords.some(k => p.className.toLowerCase().includes(k)));
         resultBox.innerHTML = '<h3 class="font-bold mb-3 text-lg border-b pb-2">Identification Results:</h3>';
-
-        if(insectResults.length){
+        if(insectResults.length) {
           insectResults.forEach(p => {
             const percent = (p.probability*100).toFixed(1);
             const name = p.className.split(',')[0];
@@ -225,16 +216,17 @@
         imgEl.src = e.target.result;
         resultBox.innerHTML = '';
         loader.style.display = 'block';
-        setTimeout(async ()=>{
-          await getModel();
-          predict();
-        }, 500);
+        setTimeout(() => predict(), 500);
       };
       reader.readAsDataURL(file);
     }
 
-    document.getElementById('file-input').addEventListener('change', e => handleFile(e.target.files[0]));
-    document.getElementById('camera-input').addEventListener('change', e => handleFile(e.target.files[0]));
+    document.getElementById('file-input').addEventListener('change', e => {
+      loadModel().then(()=>handleFile(e.target.files[0]));
+    });
+    document.getElementById('camera-input').addEventListener('change', e => {
+      loadModel().then(()=>handleFile(e.target.files[0]));
+    });
   </script>
 </body>
 </html>
